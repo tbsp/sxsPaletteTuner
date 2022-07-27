@@ -7,7 +7,7 @@ I made this tool as a means of fairly quickly finding colors which should look a
 
 # How to Use
 
-* Run your game in an emulator without color correction or with color correction disabled
+* Run your game in an emulator without color correction or with color correction disabled (disabling frame blending and shaders is also a good idea)
 * Take a screenshot (ideally at 1x zoom or 160x144 resolution)
 * Load the image into sxsPaletteTuner
 * Adjust each of the 3 color correction options to those you'd like to compare
