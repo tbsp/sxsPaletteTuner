@@ -78,7 +78,7 @@ class PaletteTunerApp(tk.Tk):
 
 		self.title("Side-by-Side Palette Tuner")
 
-		self.geometry("1100x900")
+		self.geometry("1100x700")
 
 		topFrame = tk.Frame(self)
 		topFrame.pack(side=tk.TOP)
