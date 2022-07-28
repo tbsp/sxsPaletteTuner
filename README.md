@@ -20,7 +20,7 @@ I made this tool as a means of fairly quickly finding colors which should look a
 * Tweak the colors present in the image using the color picker, text controls, and sliders provided
 * Copy the final palette values in hex for use in your game
 
-![screenshot](https://user-images.githubusercontent.com/10489588/181621225-c745d007-c224-4456-afcd-3b4db59f81e0.png)
+![screenshot](https://user-images.githubusercontent.com/10489588/181621350-3240362b-6a3b-4c47-a58f-72e6432bf3fe.png)
 
 # Notes
 
