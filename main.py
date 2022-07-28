@@ -8,11 +8,11 @@ from systems import gbc
 IMAGE_COUNT = 3
 SCALE = 2
 
-def applyFilter(image, colorMapping, scaleFunc, filterFunc=None):
+def applyFilter(image, colorMapping, scaleList, filterFunc=None):
     pixels = image.load()
     for i in range(image.size[0]):
         for j in range(image.size[1]):
-            r, g, b = [scaleFunc(x) for x in colorMapping[pixels[i, j]]]
+            r, g, b = [scaleList[x] for x in colorMapping[pixels[i, j]]]
             if filterFunc:
                 pixels[i, j] = filterFunc((r, g, b))
             else:

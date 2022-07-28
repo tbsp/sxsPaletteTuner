@@ -18,28 +18,33 @@ def gb2rgb(rgb):
 def reduceFunc(rgb):
     return (int(rgb[0]/8), int(rgb[1]/8), int(rgb[2]/8))
 
-def scaleChannel(x):
-    return (x << 3) | (x >> 2)
-
+NO_CURVE = [(x << 3) | ( x >> 2) for x in range(32)]
 CGB_CURVE = [0,6,12,20,28,36,45,56,66,76,88,100,113,125,137,149,161,172,182,192,202,210,218,225,232,238,243,247,250,252,254,255]
-def scaleChannelWithCurveCGB(x):
-    return CGB_CURVE[x]
-
 AGB_CURVE = [0,3,8,14,20,26,33,40,47,54,62,70,78,86,94,103,112,120,129,138,147,157,166,176,185,195,205,215,225,235,245,255]
-def scaleChannelWithCurveAGB(x):
-    return AGB_CURVE[x]
-
 SGB_CURVE = [0,2,5,9,15,20,27,34,42,50,58,67,76,85,94,104,114,123,133,143,153,163,173,182,192,202,211,220,229,238,247,255]
-def scaleChannelWithCurveSGB(x):
-    return SGB_CURVE[x]
+
+GAMMA_16_CGB = []
+for g in range(256):
+    GAMMA_16_CGB.append([pow((pow(g / 255.0, 1.6) * 3 + pow(b / 255.0, 1.6)) / 4, 1 / 1.6) * 255 for b in range(256)])
+
+GAMMA_22_CGB = []
+for g in range(256):
+    GAMMA_22_CGB.append([pow((pow(g / 255.0, 2.2) * 3 + pow(b / 255.0, 2.2)) / 4, 1 / 2.2) * 255 for b in range(256)])
+
+GAMMA_16_AGB = []
+for g in range(256):
+    GAMMA_16_AGB.append([pow((pow(g / 255.0, 1.6) * 5 + pow(b / 255.0, 1.6)) / 6, 1 / 1.6) * 255 for b in range(256)])
+
+GAMMA_22_AGB = []
+for g in range(256):
+    GAMMA_22_AGB.append([pow((pow(g / 255.0, 2.2) * 5 + pow(b / 255.0, 2.2)) / 6, 1 / 2.2) * 255 for b in range(256)])
+
 
 def emulateHardwareCGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 3 + pow(b / 255.0, gamma)) / 4, 1 / gamma) * 255
+    newG = GAMMA_22_CGB[g][b]
     newR = r
     newB = b
 
@@ -47,11 +52,9 @@ def emulateHardwareCGB(rgb):
 
 def emulateHardwareAGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 5 + pow(b / 255.0, gamma)) / 6, 1 / gamma) * 255
+    newG = GAMMA_22_AGB[g][b]
     newR = r
     newB = b
 
@@ -59,11 +62,9 @@ def emulateHardwareAGB(rgb):
 
 def preserveBrightnessCGB(rgb):
 
-    gamma = 1.6 # emulate hardware and preserve brightness
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 3 + pow(b / 255.0, gamma)) / 4, 1 / gamma) * 255
+    newG = GAMMA_16_CGB[g][b]
     newR = r
     newB = b
 
@@ -89,11 +90,9 @@ def preserveBrightnessCGB(rgb):
 
 def preserveBrightnessAGB(rgb):
 
-    gamma = 1.6 # emulate hardware and preserve brightness
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 5 + pow(b / 255.0, gamma)) / 6, 1 / gamma) * 255
+    newG = GAMMA_16_AGB[g][b]
     newR = r
     newB = b
 
@@ -120,11 +119,9 @@ def preserveBrightnessAGB(rgb):
 
 def reduceContrastCGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 3 + pow(b / 255.0, gamma)) / 4, 1 / gamma) * 255
+    newG = GAMMA_22_CGB[g][b]
     newR = r
     newB = b
 
@@ -140,11 +137,9 @@ def reduceContrastCGB(rgb):
 
 def reduceContrastAGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 5 + pow(b / 255.0, gamma)) / 6, 1 / gamma) * 255
+    newG = GAMMA_22_AGB[g][b]
     newR = r
     newB = b
 
@@ -161,11 +156,9 @@ def reduceContrastAGB(rgb):
 
 def lowContrastCGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 3 + pow(b / 255.0, gamma)) / 4, 1 / gamma) * 255
+    newG = GAMMA_22_CGB[g][b]
     newR = r
     newB = b
 
@@ -185,11 +178,9 @@ def lowContrastCGB(rgb):
 
 def lowContrastAGB(rgb):
 
-    gamma = 2.2
-
     r, g, b = rgb
 
-    newG = pow((pow(g / 255.0, gamma) * 5 + pow(b / 255.0, gamma)) / 6, 1 / gamma) * 255
+    newG = GAMMA_22_AGB[g][b]
     newR = r
     newB = b
 
@@ -233,19 +224,19 @@ def harshRealityFilter(image, colorMapping):
 	return image
 
 
-FILTER_ARGS = {'Disabled': (scaleChannelWithCurveCGB, None),
+FILTER_ARGS = {'Disabled': (NO_CURVE, None),
 
-               'Correct Curves (CGB)': (scaleChannelWithCurveCGB, None),
-               'Emulate Hardware (CGB)': (scaleChannelWithCurveCGB, emulateHardwareCGB),
-               'Preserve Brightness (CGB)': (scaleChannelWithCurveCGB, preserveBrightnessCGB),
-               'Reduce Contrast (CGB)': (scaleChannelWithCurveCGB, reduceContrastCGB),
-               'Harsh Reality (CGB)': (scaleChannelWithCurveCGB, lowContrastCGB),          
+               'Correct Curves (CGB)': (CGB_CURVE, None),
+               'Emulate Hardware (CGB)': (CGB_CURVE, emulateHardwareCGB),
+               'Preserve Brightness (CGB)': (CGB_CURVE, preserveBrightnessCGB),
+               'Reduce Contrast (CGB)': (CGB_CURVE, reduceContrastCGB),
+               'Harsh Reality (CGB)': (CGB_CURVE, lowContrastCGB),          
 
-               'Correct Curves (AGB)': (scaleChannelWithCurveAGB, None),
-               'Emulate Hardware (AGB)': (scaleChannelWithCurveAGB, emulateHardwareAGB),
-               'Preserve Brightness (AGB)': (scaleChannelWithCurveAGB, preserveBrightnessAGB),
-               'Reduce Contrast (AGB)': (scaleChannelWithCurveAGB, reduceContrastAGB),
-               'Harsh Reality (AGB)': (scaleChannelWithCurveAGB, lowContrastAGB),
+               'Correct Curves (AGB)': (AGB_CURVE, None),
+               'Emulate Hardware (AGB)': (AGB_CURVE, emulateHardwareAGB),
+               'Preserve Brightness (AGB)': (AGB_CURVE, preserveBrightnessAGB),
+               'Reduce Contrast (AGB)': (AGB_CURVE, reduceContrastAGB),
+               'Harsh Reality (AGB)': (AGB_CURVE, lowContrastAGB),
                }
 
 
