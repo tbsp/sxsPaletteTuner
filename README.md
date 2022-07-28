@@ -26,4 +26,4 @@ I made this tool as a means of fairly quickly finding colors which should look a
 
 * This program is completely unaware of the actual GBC palettes (8 background, 8 object), and operates entirely on the image it's provided, therefore it's up to you to figure out which color maps to which palette entry in your game.
 * Implementing this in another language, or as an extension of an accurate emulator which is palette aware would likely be far better, but this is the option I went with given time available.
-* There may be slight variations in the final hex color values compared to those in a game's source (even when not changes are made) due to rounding operations.
+* There may be slight variations in the final hex color values compared to those in a game's source (even when not changes are made) due to rounding operations or how bit 16 is handled in 15bit color values.
