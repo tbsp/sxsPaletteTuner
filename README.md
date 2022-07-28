@@ -5,6 +5,8 @@ Originally Game Boy Color games only had to worry about how they looked on an ac
 
 I made this tool as a means of fairly quickly finding colors which should look alright on a range of screens/emulators, base on the color correction methods from [SameBoy](https://github.com/LIJI32/SameBoy). Many thanks to LIJI for their endless work on researching/documenting/emulating the corner case quirks of these devices. I wouldn't have been able to throw this tool together without their color correction work.
 
+![screenshot](https://user-images.githubusercontent.com/10489588/181621350-3240362b-6a3b-4c47-a58f-72e6432bf3fe.png)
+
 # Requirements
 
 * Python 3
@@ -19,8 +21,6 @@ I made this tool as a means of fairly quickly finding colors which should look a
 * Adjust each of the color correction options to those you'd like to compare
 * Tweak the colors present in the image using the color picker, text controls, and sliders provided
 * Copy the final palette values in hex for use in your game
-
-![screenshot](https://user-images.githubusercontent.com/10489588/181621350-3240362b-6a3b-4c47-a58f-72e6432bf3fe.png)
 
 # Notes
 
