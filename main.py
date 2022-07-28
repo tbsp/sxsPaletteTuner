@@ -1,9 +1,13 @@
 
 import tkinter as tk
 from tkinter import filedialog as fd
+from tkinter import messagebox
 from PIL import ImageTk, Image
 
 from systems import gbc
+
+# The default is 256, which is likely fine for GBC, but let's crank it up a bit for fun
+MAX_COLORS = 2048
 
 def applyFilter(image, colorMapping, scaleList, filterFunc=None):
     pixels = image.load()
@@ -62,7 +66,6 @@ class FilteredImageFrame(tk.Frame):
 		imageTK = ImageTk.PhotoImage(image)
 		self.imageLabel.configure(image=imageTK)
 		self.imageLabel.image = imageTK # some trick to avoid GC (https://stackoverflow.com/a/3482156)
-
 			
 
 class PaletteTunerApp(tk.Tk):
@@ -104,15 +107,31 @@ class PaletteTunerApp(tk.Tk):
 		self.imageFrame = tk.Frame(self)
 		self.imageFrame.pack(side=tk.TOP)
 
-		# Create parent for color frames
-		self.colorFrame = tk.Frame(self)
-		self.colorFrame.pack(side=tk.TOP)
+		self.canvas = tk.Canvas(self)
+		self.scrollableFrame = tk.Frame(self.canvas)
+		vsb = tk.Scrollbar(self, orient='vertical', command=self.canvas.yview)
+		vsb.pack(side='right', fill='y')
+		self.canvas.configure(yscrollcommand=vsb.set)
+		self.canvas.pack(side=tk.TOP, fill='both', expand=True)
+		self.canvasFrame = self.canvas.create_window((0, 0), window=self.scrollableFrame, anchor='nw')
+
+		self.scrollableFrame.bind("<Configure>", self.onFrameConfigure)
+		self.canvas.bind('<Configure>', self.FrameWidth)
+
 		self.colorFrames = []
 
 		self.createFitlerFrames()
 
 		self.scaleVar.trace('w', self.updateFilteredImages)
 		self.countVar.trace('w', self.createFitlerFrames)
+
+	def FrameWidth(self, event):
+		canvas_width = event.width
+		self.canvas.itemconfig(self.canvasFrame, width = canvas_width)
+
+	def onFrameConfigure(self, event):
+		'''Reset the scroll region to encompass the inner frame'''
+		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
 	def load_button(self):
 		filename = fd.askopenfilename()
@@ -167,13 +186,15 @@ class PaletteTunerApp(tk.Tk):
 				frame.updateImage()
 
 	def updateColorControls(self):
-		colors = self.systemImage.getcolors()
+		colors = self.systemImage.getcolors(MAX_COLORS)
 
-		for index, (__, colorRGB) in enumerate(colors):
-			colorFrame = gbc.ColorEditingFrame(colorRGB, master=self.colorFrame)
-			colorFrame.pack(side=tk.TOP)
-			self.colorFrames.append(colorFrame)
-
+		if colors:
+			for index, (__, colorRGB) in enumerate(colors):
+				colorFrame = gbc.ColorEditingFrame(self, colorRGB, master=self.scrollableFrame)
+				colorFrame.pack(side=tk.TOP)
+				self.colorFrames.append(colorFrame)
+		else:
+			messagebox.showerror('Error', 'More than {} colors found in image. Try reducing the color count.'.format(MAX_COLORS))
 		
 if __name__ == '__main__':
 

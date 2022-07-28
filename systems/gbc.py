@@ -241,9 +241,10 @@ FILTER_ARGS = {'Disabled': (NO_CURVE, None),
 
 
 class ColorEditingFrame(tk.Frame):
-    def __init__(self, colorRGB, *args, **kwargs):
+    def __init__(self, topFrame, colorRGB, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
 
+        self.topFrame = topFrame
         self.originalRGB = colorRGB
 
         self.rVar = tk.IntVar(self, colorRGB[0])
@@ -289,9 +290,9 @@ class ColorEditingFrame(tk.Frame):
         copyButton = tk.Button(self, text='Copy', command=self.copyHex)
         copyButton.pack(side=tk.LEFT)
 
-        self.rVar.trace('w', self.master.master.updateFilteredImages)
-        self.gVar.trace('w', self.master.master.updateFilteredImages)
-        self.bVar.trace('w', self.master.master.updateFilteredImages)
+        self.rVar.trace('w', self.topFrame.updateFilteredImages)
+        self.gVar.trace('w', self.topFrame.updateFilteredImages)
+        self.bVar.trace('w', self.topFrame.updateFilteredImages)
 
         self.rVar.trace('w', self.updateHexValue)
         self.gVar.trace('w', self.updateHexValue)
